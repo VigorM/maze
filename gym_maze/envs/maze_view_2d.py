@@ -39,7 +39,7 @@ class MazeView2D:
             self.__screen_size = tuple(map(sum, zip(screen_size, (-1, -1))))
 
         # Set the map
-        self.__map = np.zeros((2*self.maze.MAZE_W + 1, 2*self.maze.MAZE_W + 1), dtype=int)
+        self.__map = np.zeros((2*self.maze.MAZE_W + 1, 2*self.maze.MAZE_W + 1), dtype=np.float32)
 
         # Set the starting point
         self.__entrance = np.zeros(2, dtype=int)
@@ -281,7 +281,7 @@ class MazeView2D:
         elif transparency == 255:
             map_robot_x = int(self.__robot[0] * 2 + 1)
             map_robot_y = int(self.__robot[1] * 2 + 1)
-            map[map_robot_y][map_robot_x] = 2
+            map[map_robot_y][map_robot_x] = 0.3
 
 
     def __draw_entrance(self, colour=(0, 0, 150), transparency=235):
@@ -329,7 +329,7 @@ class MazeView2D:
         
         x = int(cell[0] * 2 + 1)
         y = int(cell[1] * 2 + 1)
-        map[x, y] = 3
+        map[x, y] = 0.6
 
     @property
     def maze(self):

@@ -22,16 +22,23 @@ import torchvision.transforms as T
 Transition = namedtuple('Transion', 
                         ('state', 'action', 'next_state', 'reward'))
 
+seed = 54321
+random.seed(seed)
+np.random.seed(seed)
+torch.random.manual_seed(seed)
+
 
 def select_action(state,plot=False, steps=0):
     global steps_done
     sample = random.random()
-    eps_threshold = EPS_END + (EPS_START - EPS_END)* \
-        math.exp(-1. * steps_done / EPS_DECAY)
+    # eps_threshold = EPS_END + (EPS_START - EPS_END)* \
+    #     math.exp(-1. * steps_done / EPS_DECAY)
+    eps_threshold = 0.05
     steps_done += 1
-    if sample > eps_threshold:
+    if sample > eps_threshold and steps_done > 1000:
         with torch.no_grad():
-            state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda'),0),0)
+            # state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda'),0),0)
+            state_preprocess = torch.unsqueeze(torch.unsqueeze(state,0),0)
             # a = policy_net(torch.unsqueeze(state.to('cuda'),0)).view(1,1)
 
             # return policy_net(torch.unsqueeze(state.to('cuda'),0)).max(1)[1].view(1, 1)
@@ -40,7 +47,7 @@ def select_action(state,plot=False, steps=0):
         return torch.tensor([[random.randrange(4)]], device=device, dtype=torch.long)
 
     
-def optimize_model():
+def optimize_model(logprint=False):
     if len(memory) < BATCH_SIZE:
         return
     transitions = memory.sample(BATCH_SIZE)
@@ -55,8 +62,10 @@ def optimize_model():
     batch = Transition(*zip(*transitions))
     
     states = tuple((map(lambda s: torch.unsqueeze(torch.unsqueeze(s,0),0), batch.state)))
-    actions = tuple((map(lambda a: torch.tensor([[a]], device='cuda'), batch.action))) 
-    rewards = tuple((map(lambda r: torch.tensor([r], device='cuda'), batch.reward))) 
+    # actions = tuple((map(lambda a: torch.tensor([[a]], device='cuda'), batch.action))) 
+    # rewards = tuple((map(lambda r: torch.tensor([r], device='cuda'), batch.reward))) 
+    actions = tuple((map(lambda a: torch.tensor([[a]]), batch.action))) 
+    rewards = tuple((map(lambda r: torch.tensor([r]), batch.reward))) 
 
     non_final_mask = torch.tensor(
         tuple(map(lambda s: s is not None, batch.next_state)),
@@ -64,10 +73,12 @@ def optimize_model():
     
     non_final_next_states = [s for s in batch.next_state if s is not None]
     non_final_next_states = tuple((map(lambda s: torch.unsqueeze(torch.unsqueeze(s,0),0), non_final_next_states)))
-    non_final_next_states = torch.cat(non_final_next_states).to('cuda')
+    # non_final_next_states = torch.cat(non_final_next_states).to('cuda')
+    non_final_next_states = torch.cat(non_final_next_states)
     
 
-    state_batch = torch.cat(states).to('cuda')
+    # state_batch = torch.cat(states).to('cuda')
+    state_batch = torch.cat(states)
 
     # state_batch = torch.tensor(batch.state, device='cuda')
     action_batch = torch.cat(actions)
@@ -80,6 +91,9 @@ def optimize_model():
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
     
     loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+    if logprint:
+        print(state_action_values, expected_state_action_values, reward_batch)
+        print(loss)
     
     optimizer.zero_grad()
     loss.backward()
@@ -100,29 +114,29 @@ def train(env, n_episodes, render=False):
         env.maze_change()
         obs = env.reset()
         plotnow = False
+        logprint = False
         # state = env.maze_view.map
         state = get_state(obs)
         total_reward = 0.0
         for t in count():
-            
-            # if episode % 1 == 0:
-            #     render = True
-            #     plotnow = True
-            if episode % 10 == 0:
-                render = True
+            if t == 1:
                 plotnow = True
             else:
-                render = False
                 plotnow = False 
+            if episode == 0:
+                render = False
+            else:
+                render = False
             if render:
-                env.render()
-
+                env.render() 
             action = select_action(state, plotnow, steps_done)
-            robot_pos_bef = env.maze_view.robot
+            robot_pos_bef = np.copy(env.maze_view.robot)
             obs, reward, done, info = env.step(action)
-            robot_pos_aft = env.maze_view.robot
+            robot_pos_aft = np.copy(env.maze_view.robot)
             if np.all(robot_pos_aft == robot_pos_bef):
-               reward = -0.2/(env.maze_size[0]*env.maze_size[0])
+                reward += -0.2/(env.maze_size[0]*env.maze_size[0])
+            reward *= 100
+
             total_reward += reward
 
             if not done:
@@ -134,18 +148,23 @@ def train(env, n_episodes, render=False):
 
             memory.push(state, action.to('cpu'), next_state, reward.to('cpu'))
             state = next_state
+            
+            if t % 250 == 0:
+                logprint = True
+                print('Total steps: {} \t Episode/time: {}/{} \t Total reward: {}'.format(steps_done, episode, t, total_reward))
+            else:
+                logprint = False
 
             if steps_done > INITIAL_MEMORY:
                 plotnow = True
-                optimize_model()
+                optimize_model(logprint)
                 # Target network update
                 if steps_done % TARGET_UPDATE == 0:
                     target_net.load_state_dict(policy_net.state_dict())
 
             if done:
+                print('Done, Total steps: {} \t Episode/time: {}/{} \t Total reward: {}'.format(steps_done, episode, t, total_reward))
                 break
-        if episode % 20 == 0:
-                print('Total steps: {} \t Episode: {}/{} \t Total reward: {}'.format(steps_done, episode, t, total_reward))
     env.close()
     return
 
@@ -158,7 +177,8 @@ def test(env, n_episodes, policy, render=True):
         state = get_state(obs)
         total_reward = 0.0
         for t in count():
-            state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda'),0),0)
+            # state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda'),0),0)
+            state_preprocess = torch.unsqueeze(torch.unsqueeze(state,0),0)
             action = policy(state_preprocess).max(1)[1].view(1,1)
 
             if render:
@@ -188,7 +208,7 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # hyperparameters
-    BATCH_SIZE = 32
+    BATCH_SIZE = 2
     GAMMA = 0.99
     EPS_START = 1
     EPS_END = 0.02

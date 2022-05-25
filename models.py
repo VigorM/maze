@@ -97,6 +97,7 @@ class DQN(nn.Module):
             for i in range(32):
                 axes[i//8, i%8].imshow(x_numpy[0,i,:,:])
             plt.savefig('test/conv3_{}.png'.format(steps))
+        plt.close('all')
 
         # x = self.flatten(x)
         # print("x shape: ",x.shape)
