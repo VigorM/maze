@@ -22,14 +22,18 @@ import torchvision.transforms as T
 Transition = namedtuple('Transion', 
                         ('state', 'action', 'next_state', 'reward'))
 
+# Seed는 random number를 만들어 줄 때, 완벽히 랜덤은 아님
+# Seed를 똑같이 설정하면 똑같은 난수가 생성, 지금 코드가 돌아가고 있는 시간을 받아서 Seed로 쓴다면 완전한 난수 가능
 
 def select_action(state,plot=False, steps=0):
     global steps_done
     sample = random.random()
-    eps_threshold = EPS_END + (EPS_START - EPS_END)* \
-        math.exp(-1. * steps_done / EPS_DECAY)
+    # eps_threshold = EPS_END + (EPS_START - EPS_END)* \
+    #     math.exp(-1. * steps_done / EPS_DECAY)
+    # eps_threshold 값에 100을 곱한 확률로 Agent가 랜덤으로 action을 취함
+    eps_threshold = 0.05
     steps_done += 1
-    if sample > eps_threshold:
+    if sample > eps_threshold and steps_done > 1000:
         with torch.no_grad():
             state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda'),0),0)
             # a = policy_net(torch.unsqueeze(state.to('cuda'),0)).view(1,1)
@@ -104,13 +108,16 @@ def train(env, n_episodes, render=False):
         state = get_state(obs)
         total_reward = 0.0
         for t in count():
-            
+
             # if episode % 1 == 0:
             #     render = True
             #     plotnow = True
             if episode % 10 == 0:
                 render = True
-                plotnow = True
+                if t % 500 == 0:
+                    plotnow = True
+                else:
+                    plotnow = False
             else:
                 render = False
                 plotnow = False 
@@ -118,11 +125,13 @@ def train(env, n_episodes, render=False):
                 env.render()
 
             action = select_action(state, plotnow, steps_done)
+
             robot_pos_bef = env.maze_view.robot
             obs, reward, done, info = env.step(action)
             robot_pos_aft = env.maze_view.robot
             if np.all(robot_pos_aft == robot_pos_bef):
-               reward = -0.2/(env.maze_size[0]*env.maze_size[0])
+               reward += -0.2/(env.maze_size[0]*env.maze_size[0])
+            
             total_reward += reward
 
             if not done:
@@ -135,6 +144,9 @@ def train(env, n_episodes, render=False):
             memory.push(state, action.to('cpu'), next_state, reward.to('cpu'))
             state = next_state
 
+            if steps_done % 500 == 0:
+                print('Total steps: {} \t Episode: {}/{} \t Total reward: {}'.format(steps_done, episode, t, total_reward))
+
             if steps_done > INITIAL_MEMORY:
                 plotnow = True
                 optimize_model()
@@ -143,9 +155,10 @@ def train(env, n_episodes, render=False):
                     target_net.load_state_dict(policy_net.state_dict())
 
             if done:
-                break
-        if episode % 20 == 0:
                 print('Total steps: {} \t Episode: {}/{} \t Total reward: {}'.format(steps_done, episode, t, total_reward))
+                break
+        # if episode % 20 == 0:
+        #         print('Total steps: {} \t Episode: {}/{} \t Total reward: {}'.format(steps_done, episode, t, total_reward)) # t는 episode의 time step
     env.close()
     return
 
@@ -197,7 +210,7 @@ if __name__ == '__main__':
     RENDER = False
     lr = 1e-4
     INITIAL_MEMORY = 10
-    MEMORY_SIZE = 100 * INITIAL_MEMORY
+    MEMORY_SIZE = 10 * INITIAL_MEMORY # 100 * INITAIL_MEMORY
 
     # create networks
     policy_net = DQN(n_actions=4).to(device)
