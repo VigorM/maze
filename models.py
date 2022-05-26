@@ -147,7 +147,6 @@ class DQN(nn.Module):
         x = F.relu(self.fc4(x.view(batch, -1)))
         x = F.relu(self.fc5(x))
 
-        x = self.convs(x)
         x = x.view(-1, self.conv_output_size)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
         a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
