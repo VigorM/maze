@@ -81,7 +81,6 @@ else:
 def log(s):
   print('[' + str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S')) + '] ' + s)
 
-
 def load_memory(memory_path, disable_bzip):
   if disable_bzip:
     with open(memory_path, 'rb') as pickle_file:
