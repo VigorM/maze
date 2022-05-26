@@ -83,7 +83,6 @@ class DQN(nn.Module):
             n_actions (int): number of outputs
         """
         super(DQN, self).__init__()
-        self.atoms = args.atoms
         self.conv1 = nn.Conv2d(in_channels, 16, kernel_size=4, stride=1) # kernel_size=4
         # self.bn1 = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1) # kernel_size=3
