@@ -3,7 +3,11 @@ import pygame
 import random
 import numpy as np
 import os
+os.environ['SDL_VIDEODRIVER']='dummy'
 import sys
+import pygame
+pygame.display.set_mode((640,480))
+
 
 
 class MazeView2D:
