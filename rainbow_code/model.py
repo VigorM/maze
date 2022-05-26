@@ -47,7 +47,7 @@ class NoisyLinear(nn.Module):
 
 
 class DQN(nn.Module):
-  def __init__(self, args, action_space):
+  def __init__(self, action_space):
     super(DQN, self).__init__()
     self.atoms = args.atoms
     self.action_space = action_space

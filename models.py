@@ -74,7 +74,7 @@ class NoisyLinear(nn.Module):
 
 
 class DQN(nn.Module):
-    def __init__(self, args, in_channels=1, n_actions=4):
+    def __init__(self, in_channels=1, n_actions=4):
         """
         Initialize Deep Q Network
 
@@ -97,10 +97,10 @@ class DQN(nn.Module):
         self.fc5 = nn.Linear(128, 128)
         self.conv_output_size = 128
         self.head = nn.Linear(128, n_actions)
-        self.fc_h_v = NoisyLinear(self.conv_output_size, args.hidden_size, std_init=args.noisy_std)
-        self.fc_h_a = NoisyLinear(self.conv_output_size, args.hidden_size, std_init=args.noisy_std)
-        self.fc_z_v = NoisyLinear(args.hidden_size, self.atoms, std_init=args.noisy_std)
-        self.fc_z_a = NoisyLinear(args.hidden_size, n_actions * self.atoms, std_init=args.noisy_std)
+        self.fc_h_v = NoisyLinear(self.conv_output_size, 512, std_init=0.1)
+        self.fc_h_a = NoisyLinear(self.conv_output_size, 512, std_init=0.1)
+        self.fc_z_v = NoisyLinear(512, self.atoms, std_init=0.1)
+        self.fc_z_a = NoisyLinear(512, n_actions * self.atoms, std_init=0.1)
         
     def forward(self, x, plot=False, log=False, steps=0):
         # x를 map, my_pos, terminal로 나누기
