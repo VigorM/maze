@@ -1,5 +1,3 @@
-#!/User/bin/python
-# -*- coding: ascii -*-
 import copy
 from collections import namedtuple
 from itertools import count
