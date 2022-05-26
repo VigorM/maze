@@ -150,7 +150,7 @@ class DQN(nn.Module):
         x = x.view(-1, self.conv_output_size)
         v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
         a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
-        v, a = v.view(-1, 1, self.atoms), a.view(-1, self.action_space, self.atoms)
+        v, a = v.view(-1, 1, 4), a.view(-1, [0, 1, 2, 3], 4)
         q = v + a - a.mean(1, keepdim=True)  # Combine streams
         if log:  # Use log softmax for numerical stability
             q = F.log_softmax(q, dim=2)  # Log probabilities with action over second dimension
