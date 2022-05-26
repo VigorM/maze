@@ -6,6 +6,7 @@ import torchvision.transforms as T
 
 from matplotlib import pyplot as plt
 import os
+import math
 
 class DQNbn(nn.Module):
     def __init__(self, in_channels=1, n_actions=14):
