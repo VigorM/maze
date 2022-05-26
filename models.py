@@ -99,8 +99,8 @@ class DQN(nn.Module):
         self.head = nn.Linear(128, n_actions)
         self.fc_h_v = NoisyLinear(self.conv_output_size, 512, std_init=0.1)
         self.fc_h_a = NoisyLinear(self.conv_output_size, 512, std_init=0.1)
-        self.fc_z_v = NoisyLinear(512, self.atoms, std_init=0.1)
-        self.fc_z_a = NoisyLinear(512, n_actions * self.atoms, std_init=0.1)
+        self.fc_z_v = NoisyLinear(512, 4, std_init=0.1)
+        self.fc_z_a = NoisyLinear(512, n_actions * 4, std_init=0.1)
         
     def forward(self, x, plot=False, log=False, steps=0):
         # x를 map, my_pos, terminal로 나누기
