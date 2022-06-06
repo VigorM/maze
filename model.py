@@ -59,7 +59,7 @@ class DQN(nn.Module):
       # self.convs = nn.Sequential(nn.Conv2d(args.history_length, 32, 8, stride=4, padding=0), nn.ReLU(),
       #                            nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
       #                            nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
-      self.conv_output_size = 3136
+      self.conv_output_size = 7200
     elif args.architecture == 'data-efficient':
       self.convs = nn.Sequential(nn.Conv2d(args.history_length, 32, 5, stride=5, padding=0), nn.ReLU(),
                                  nn.Conv2d(32, 64, 5, stride=5, padding=0), nn.ReLU())
