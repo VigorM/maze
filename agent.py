@@ -61,7 +61,7 @@ class Agent():
 
   # Acts with an ε-greedy policy (used for evaluation only)
   def act_e_greedy(self, state, epsilon=0.001):  # High ε can reduce evaluation scores drastically
-    return np.random.randint(0, 4) if np.random.random() < epsilon else self.act(state)
+    return np.random.randint(0, 3) if np.random.random() < epsilon else self.act(state)
 
   def learn(self, mem):
     # Sample transitions
