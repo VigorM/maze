@@ -90,20 +90,19 @@ class MazeEnv(gym.Env):
         self.reset()
 
     def step(self, action):
-        my_action = action.item()
         if isinstance(action, int):
             self.maze_view.move_robot(self.ACTION[action])
         else:
-            if my_action == 0:
+            if action == 0:
                 action = 'N'
                 self.maze_view.move_robot(action)
-            elif my_action == 1:
+            elif action == 1:
                 action = 'E'
                 self.maze_view.move_robot(action)
-            elif my_action == 2:
+            elif action == 2:
                 action = 'S'
                 self.maze_view.move_robot(action)
-            elif my_action == 3:
+            elif action == 3:
                 action = 'W'
                 self.maze_view.move_robot(action)
 

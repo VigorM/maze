@@ -134,7 +134,7 @@ while T < args.evaluation_size:
   if done:
     state = env.reset()
 
-  next_state, _, done = env.step(np.random.randint(0, 4))
+  next_state, reward, done, info = env.step(np.random.randint(0, 3))
   val_mem.append(state, -1, 0.0, done)
   state = next_state
   T += 1
@@ -155,7 +155,7 @@ else:
       dqn.reset_noise()  # Draw a new set of noisy weights
 
     action = dqn.act(state)  # Choose an action greedily (with noisy weights)
-    next_state, reward, done = env.step(action)  # Step
+    next_state, reward, done, info = env.step(action)  # Step
     if args.reward_clip > 0:
       reward = max(min(reward, args.reward_clip), -args.reward_clip)  # Clip rewards
     mem.append(state, action, reward, done)  # Append transition to memory
