@@ -54,7 +54,7 @@ class DQN(nn.Module):
 
     if args.architecture == 'canonical':
       self.convs = nn.Sequential(nn.Conv2d(1, 21, kernel_size=4, stride=1), nn.ReLU(),
-                                 nn.Conv2d(16, 32, kernel_size=4, stride=1), nn.ReLU(),
+                                 nn.Conv2d(21, 1, kernel_size=4, stride=1), nn.ReLU(),
                                  nn.Conv2d(32, 32, kernel_size=4, stride=1), nn.ReLU())
       # self.convs = nn.Sequential(nn.Conv2d(args.history_length, 32, 8, stride=4, padding=0), nn.ReLU(),
       #                            nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
