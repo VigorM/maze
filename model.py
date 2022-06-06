@@ -52,7 +52,7 @@ class DQN(nn.Module):
     self.atoms = args.atoms
     action_space = 4
 
-    if args.architecture == 'canonical':
+    if args.architecture == 'canonical' & args.learn == 'no_learn':
       self.convs = nn.Sequential(nn.Conv2d(1, 16, kernel_size=4, stride=1), nn.ReLU(),
                                  nn.Conv2d(16, 32, kernel_size=3, stride=1), nn.ReLU(),
                                  nn.Conv2d(32, 32, kernel_size=2, stride=1), nn.ReLU())
@@ -60,6 +60,10 @@ class DQN(nn.Module):
       #                            nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
       #                            nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
       self.conv_output_size = 7200
+    elif args.architecture == 'canonical' & args.learn == 'learn':
+      self.convs = nn.Sequential(nn.Conv2d(4, 16, kernel_size=4, stride=1), nn.ReLU(),
+                                 nn.Conv2d(16, 32, kernel_size=3, stride=1), nn.ReLU(),
+                                 nn.Conv2d(32, 32, kernel_size=2, stride=1), nn.ReLU())
     elif args.architecture == 'data-efficient':
       self.convs = nn.Sequential(nn.Conv2d(args.history_length, 32, 5, stride=5, padding=0), nn.ReLU(),
                                  nn.Conv2d(32, 64, 5, stride=5, padding=0), nn.ReLU())

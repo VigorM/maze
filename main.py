@@ -30,8 +30,9 @@ parser.add_argument('--game', type=str, default='space_invaders', choices=atari_
 parser.add_argument('--T-max', type=int, default=int(1e5), metavar='STEPS', help='Number of training steps (4x number of frames)')
 # parser.add_argument('--max-episode-length', type=int, default=int(108e3), metavar='LENGTH', help='Max episode length in game frames (0 to disable)')
 parser.add_argument('--max-episode-length', type=int, default=int(1e3), metavar='LENGTH', help='Max episode length in game frames (0 to disable)')
-parser.add_argument('--history-length', type=int, default=4, metavar='T', help='Number of consecutive states processed')
+parser.add_argument('--history-length', type=int, default=2, metavar='T', help='Number of consecutive states processed')
 parser.add_argument('--architecture', type=str, default='canonical', choices=['canonical', 'data-efficient'], metavar='ARCH', help='Network architecture')
+parser.add_argument('--learn', type=str, default='no_learn', choices=['learn', 'no_learn'], metavar='ARCH', help='Learn Network')
 parser.add_argument('--hidden-size', type=int, default=512, metavar='SIZE', help='Network hidden size')
 parser.add_argument('--noisy-std', type=float, default=0.1, metavar='σ', help='Initial standard deviation of noisy linear layers')
 # parser.add_argument('--atoms', type=int, default=51, metavar='C', help='Discretised size of value distribution')
@@ -169,6 +170,7 @@ else:
       mem.priority_weight = min(mem.priority_weight + priority_weight_increase, 1)  # Anneal importance sampling weight β to 1
 
       if T % args.replay_frequency == 0:
+        args.learn == "learn"
         dqn.learn(mem)  # Train with n-step distributional double-Q learning
 
       if T % args.evaluation_interval == 0:
