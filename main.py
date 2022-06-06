@@ -136,6 +136,7 @@ val_mem = ReplayMemory(args, args.evaluation_size)
 T, done = 0, True
 while T < args.evaluation_size:
   if done:
+    env.maze_change()
     state = env.reset()
 
   next_state, reward, done, info = env.step(np.random.randint(0, 3))
@@ -153,6 +154,7 @@ else:
   done = True
   for T in trange(1, args.T_max + 1):
     if done:
+      env.maze_change()
       state = env.reset()
 
     if T % args.replay_frequency == 0:
