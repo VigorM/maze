@@ -15,7 +15,7 @@ class Agent():
     self.atoms = args.atoms
     self.Vmin = args.V_min
     self.Vmax = args.V_max
-    # self.support = torch.linspace(args.V_min, args.V_max, self.atoms).to(device=args.device)  # Support (range) of z
+    self.support = torch.linspace(args.V_min, args.V_max, self.atoms).to(device=args.device)  # Support (range) of z
     self.delta_z = (args.V_max - args.V_min) / (self.atoms - 1)
     self.batch_size = args.batch_size
     self.n = args.multi_step
@@ -57,7 +57,7 @@ class Agent():
       # state_preprocess = state_preprocess.repeat(2, 2, 1, 1)
       # return (self.online_net(state.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
       # print(state_preprocess.shape)
-      return (self.online_net(state_preprocess)).sum(2).argmax(1).item()
+      return (self.online_net(state_preprocess) * self.support).sum(2).argmax(1).item()
 
   # Acts with an ε-greedy policy (used for evaluation only)
   def act_e_greedy(self, state, epsilon=0.001):  # High ε can reduce evaluation scores drastically
