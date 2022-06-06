@@ -135,7 +135,8 @@ class ReplayMemory():
     # Retrieve all required transition data (from t - h to t + n)
     transitions = self._get_transitions(idxs)
     # Create un-discretised states and nth next states
-    all_states = transitions['state']
+    my_all_states = transitions['state']
+    all_states = np.copy(my_all_states)
     states = torch.tensor(all_states[:, :self.history], device=self.device, dtype=torch.float32).div_(255)
     next_states = torch.tensor(all_states[:, self.n:self.n + self.history], device=self.device, dtype=torch.float32).div_(255)
     # Discrete actions to be used as index
