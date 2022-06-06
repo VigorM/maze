@@ -53,17 +53,13 @@ class DQN(nn.Module):
     action_space = 4
 
     if args.architecture == 'canonical':
-      self.convs = nn.Sequential(nn.Conv2d(1, 16, kernel_size=4, stride=1), nn.ReLU(),
+      self.convs = nn.Sequential(nn.Conv2d(2, 16, kernel_size=4, stride=1), nn.ReLU(),
                                  nn.Conv2d(16, 32, kernel_size=3, stride=1), nn.ReLU(),
                                  nn.Conv2d(32, 32, kernel_size=2, stride=1), nn.ReLU())
       # self.convs = nn.Sequential(nn.Conv2d(args.history_length, 32, 8, stride=4, padding=0), nn.ReLU(),
       #                            nn.Conv2d(32, 64, 4, stride=2, padding=0), nn.ReLU(),
       #                            nn.Conv2d(64, 64, 3, stride=1, padding=0), nn.ReLU())
       self.conv_output_size = 7200
-    elif args.architecture == 'learn':
-      self.convs = nn.Sequential(nn.Conv2d(4, 16, kernel_size=4, stride=1), nn.ReLU(),
-                                 nn.Conv2d(16, 32, kernel_size=3, stride=1), nn.ReLU(),
-                                 nn.Conv2d(32, 32, kernel_size=2, stride=1), nn.ReLU())
     elif args.architecture == 'data-efficient':
       self.convs = nn.Sequential(nn.Conv2d(args.history_length, 32, 5, stride=5, padding=0), nn.ReLU(),
                                  nn.Conv2d(32, 64, 5, stride=5, padding=0), nn.ReLU())
