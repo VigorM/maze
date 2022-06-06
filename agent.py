@@ -54,7 +54,7 @@ class Agent():
     with torch.no_grad():
       state = torch.Tensor(state)
       state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda') ,0),0)
-      state_preprocess = state_preprocess.repeat(2, 2, 1, 1)
+      # state_preprocess = state_preprocess.repeat(2, 2, 1, 1)
       # return (self.online_net(state.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
       # print(state_preprocess.shape)
       return (self.online_net(state_preprocess)).sum(2).argmax(1).item()
