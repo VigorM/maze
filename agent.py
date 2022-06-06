@@ -53,7 +53,7 @@ class Agent():
   def act(self, state):
     with torch.no_grad():
       state = torch.Tensor(state)
-      state_preprocess = torch.unsqueeze(torch.unsqueeze(state,0),0)
+      state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cpu') ,0),0)
       # return (self.online_net(state.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
       return (self.online_net(state_preprocess)).sum(2).argmax(1).item()
 
