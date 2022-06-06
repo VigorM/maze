@@ -55,6 +55,7 @@ class Agent():
       state = torch.Tensor(state)
       state_preprocess = torch.unsqueeze(torch.unsqueeze(state.to('cuda') ,0),0)
       # return (self.online_net(state.unsqueeze(0)) * self.support).sum(2).argmax(1).item()
+      print(state_preprocess.shape)
       return (self.online_net(state_preprocess)).sum(2).argmax(1).item()
 
   # Acts with an ε-greedy policy (used for evaluation only)
