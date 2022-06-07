@@ -107,7 +107,7 @@ class MazeEnv(gym.Env):
                 self.maze_view.move_robot(action)
 
         if np.array_equal(self.maze_view.robot, self.maze_view.goal):
-            reward = 10 # 기존값 1
+            reward = 1 # 기존값 1
             done = True
         else:
             # reward = -1
