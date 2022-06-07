@@ -73,14 +73,14 @@ class DQN(nn.Module):
   def forward(self, x, log=False, T=0):
     x = self.convs(x)
 
-    if T % args.replay_frequency == 0:
+    if T % 4 == 0:
       x_numpy = x.cpu().detach().numpy()
       fig, axes = plt.subplots(4,8)
       for i in range(32):
         axes[i//8, i%8].imshow(x_numpy[0,i,:,:])
         plt.savefig('test/conv3_{}.png'.format(T))
     plt.close('all')
-    
+
     x = x.view(-1, self.conv_output_size)
     v = self.fc_z_v(F.relu(self.fc_h_v(x)))  # Value stream
     a = self.fc_z_a(F.relu(self.fc_h_a(x)))  # Advantage stream
